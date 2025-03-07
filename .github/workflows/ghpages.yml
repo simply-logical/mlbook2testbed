@@ -54,7 +54,7 @@ jobs:
         github.event_name == 'push'
         && github.repository == 'simply-logical/mlbook2testbed'
         && github.ref == 'refs/heads/master'
-      uses: JamesIves/github-pages-deploy-action@3.7.1
+      uses: JamesIves/github-pages-deploy-action@4
       with:
         ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         FOLDER: _quarto_build_html
