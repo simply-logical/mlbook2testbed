@@ -1,0 +1,81 @@
+name: Build LaTeX and Send to Overleaf
+on: [push]
+jobs:
+  build-latex-to-overleaf:
+    name: Publish to Overleaf
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Set extra env
+      env:
+        QUARTO_VERSION: 1.6.42
+      run: |
+        echo "QUARTO_VERSION=${QUARTO_VERSION}" >> $GITHUB_ENV
+    - name: Checkout the code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 5
+        submodules: false
+        persist-credentials: false
+    - name: Set up SSH keys 🔑
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: |
+          ${{ secrets.OVERLEAF_DEPLOYMENT_KEY }}
+    - name: Cache Quarto build
+      uses: actions/cache@v3
+      with:
+        path: |
+          /home/runner/.cache/torch
+          /opt/quarto
+          .quarto
+          _quarto_build_latex
+          _overleaf_mlbook2testbed
+        key: ${{ runner.os }}-part_build
+        # key: ${{ runner.os }}-${{ hashFiles('examples/**') }}
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Install LaTeX
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          dvipng \
+          texlive \
+          texlive-xetex \
+          texlive-fonts-recommended \
+          cm-super
+    - name: Install Quarto 💾
+      run: |
+        sudo mkdir -p /opt/quarto/${QUARTO_VERSION}
+        sudo curl -o quarto.tar.gz -L \
+          "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.tar.gz"
+        sudo tar -zxvf quarto.tar.gz \
+          -C "/opt/quarto/${QUARTO_VERSION}" \
+          --strip-components=1
+        sudo rm quarto.tar.gz
+        sudo ln -s /opt/quarto/${QUARTO_VERSION}/bin/quarto /usr/local/bin/quarto
+        /opt/quarto/"${QUARTO_VERSION}"/bin/quarto check
+        /usr/local/bin/quarto check
+        quarto check
+    - name: Get latest Overleaf
+      run: |
+        [ ! -d _overleaf_mlbook2testbed ] && git clone --depth 1 https://git@git.overleaf.com/${{ secrets.OVERLEAF_REPO }} _overleaf_mlbook2testbed
+        [ -d _overleaf_mlbook2testbed ] && cd _overleaf_mlbook2testbed && git pull origin master && cd ..
+    - name: Build LaTeX PDF
+      run: |
+        quarto render . --no-clean --output-dir _quarto_build_latex --to latex
+    - name: Publish to Overleaf
+      if: >
+        github.event_name == 'push'
+        && github.repository == 'simply-logical/mlbook2testbed'
+        && github.ref == 'refs/heads/master'
+      run: |
+        git config user.name "GitHub Action Deploy Bot"
+        git config user.email "github-action-deploy@simply-logical.space" 
+        rsync -rclpDv --exclude=".git" --delete-before _quarto_build_latex _overleaf_mlbook2testbed
+        cd _overleaf_mlbook2testbed
+        git add -f *
+        GIT_CHANGES=`git status --porcelain`
+        [ ! -z "$GIT_CHANGES" ] && git status && git commit -am "Deploying from GitHub" && git push origin master && git status

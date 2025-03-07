@@ -1,0 +1,11 @@
+project:
+  title: MLbook2Testbed
+  render:
+    - MLbook2Testbed.qmd
+
+book:
+  title: "ML Book 2 Testbed"
+  author: "Peter, Mitra, Kacper"
+  date: "\\today"
+  chapters:
+    - MLbook2Testbed.qmd
