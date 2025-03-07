@@ -1,4 +1,5 @@
 .DS_Store
 
-.quarto/
+/.quarto/
 _quarto_build_latex/
+_quarto_build_html/

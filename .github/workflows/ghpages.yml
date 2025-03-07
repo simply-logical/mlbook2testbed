@@ -1,0 +1,53 @@
+name: Build HTML and Send to GitHub Pages
+on: [push]
+jobs:
+  build-html-to-ghpages:
+    name: Publish to GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 5
+        submodules: false
+        persist-credentials: false
+    - name: Cache Quarto build
+      uses: actions/cache@v3
+      with:
+        path: |
+          /home/runner/.cache/torch
+          /opt/quarto
+          .quarto
+          _quarto_build_html
+          _ghpages_mlbook2testbed
+        key: ${{ runner.os }}-html_build
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Install Quarto 💾
+      run: |
+        sudo mkdir -p /opt/quarto/${QUARTO_VERSION}
+        sudo curl -o quarto.tar.gz -L \
+          "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.tar.gz"
+        sudo tar -zxvf quarto.tar.gz \
+          -C "/opt/quarto/${QUARTO_VERSION}" \
+          --strip-components=1
+        sudo rm quarto.tar.gz
+        sudo ln -s /opt/quarto/${QUARTO_VERSION}/bin/quarto /usr/local/bin/quarto
+        /opt/quarto/"${QUARTO_VERSION}"/bin/quarto check
+        /usr/local/bin/quarto check
+        quarto check
+    - name: Build HTML
+      run: |
+        quarto render . --no-clean --output-dir _quarto_build_html --to html
+    - name: Publish to GH Pages 🚀
+      if: >
+        github.event_name == 'push'
+        && github.repository == 'simply-logical/mlbook2testbed'
+        && github.ref == 'refs/heads/master'
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        FOLDER: _quarto_build_html
+        CLEAN: true
