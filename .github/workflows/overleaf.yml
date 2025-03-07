@@ -72,10 +72,10 @@ jobs:
         && github.repository == 'simply-logical/mlbook2testbed'
         && github.ref == 'refs/heads/master'
       run: |
-        git config user.name "GitHub Action Deploy Bot"
-        git config user.email "github-action-deploy@simply-logical.space" 
         rsync -rclpDv --exclude=".git" --delete-before _quarto_build_latex _overleaf_mlbook2testbed
         cd _overleaf_mlbook2testbed
+        git config user.name "GitHub Action Deploy Bot"
+        git config user.email "github-action-deploy@simply-logical.space"
         git add -f *
         GIT_CHANGES=`git status --porcelain`
         [ ! -z "$GIT_CHANGES" ] && git status && git commit -am "Deploying from GitHub" && git push origin master && git status
