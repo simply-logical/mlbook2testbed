@@ -1,5 +1,7 @@
 name: Build HTML and Send to GitHub Pages
 on: [push]
+permissions:
+  contents: write
 jobs:
   build-html-to-ghpages:
     name: Publish to GitHub Pages
