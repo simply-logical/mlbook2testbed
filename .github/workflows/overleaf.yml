@@ -80,4 +80,4 @@ jobs:
         git config user.email "github-action-deploy@simply-logical.space"
         git add -f *
         GIT_CHANGES=`git status --porcelain`
-        if [ -n "$GIT_CHANGES" ]; then; git status && git commit -am "Deploying from GitHub" && git push origin master && git status; fi
+        if [ -n "$GIT_CHANGES" ]; then git status && git commit -am "Deploying from GitHub" && git push origin master && git status; fi
