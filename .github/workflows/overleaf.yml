@@ -17,11 +17,11 @@ jobs:
         fetch-depth: 5
         submodules: false
         persist-credentials: false
-    - name: Set up SSH keys 🔑
-      uses: webfactory/ssh-agent@v0.9.0
-      with:
-        ssh-private-key: |
-          ${{ secrets.OVERLEAF_DEPLOYMENT_KEY }}
+#    - name: Set up SSH keys 🔑
+#      uses: webfactory/ssh-agent@v0.9.0
+#      with:
+#        ssh-private-key: |
+#          ${{ secrets.OVERLEAF_DEPLOYMENT_KEY }}
     - name: Cache Quarto build
       uses: actions/cache@v3
       with:
@@ -61,7 +61,7 @@ jobs:
         quarto check
     - name: Get latest Overleaf
       run: |
-        [ ! -d _overleaf_mlbook2testbed ] && git clone --depth 1 https://git@git.overleaf.com/${{ secrets.OVERLEAF_REPO }} _overleaf_mlbook2testbed
+        [ ! -d _overleaf_mlbook2testbed ] && git clone --depth 1 https://git:${{ secrets.OVERLEAF_DEPLOYMENT_KEY }}@git.overleaf.com/${{ secrets.OVERLEAF_REPO }} _overleaf_mlbook2testbed
         [ -d _overleaf_mlbook2testbed ] && cd _overleaf_mlbook2testbed && git pull origin master && cd ..
     - name: Build LaTeX PDF
       run: |
