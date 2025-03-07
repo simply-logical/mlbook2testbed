@@ -26,6 +26,8 @@ jobs:
       uses: actions/cache@v3
       with:
         path: |
+          /var/lib/apt/lists
+          /var/cache/apt
           /home/runner/.cache/torch
           /opt/quarto
           .quarto
@@ -72,7 +74,7 @@ jobs:
         && github.repository == 'simply-logical/mlbook2testbed'
         && github.ref == 'refs/heads/master'
       run: |
-        rsync -rclpDv --exclude=".git" --delete-before _quarto_build_latex _overleaf_mlbook2testbed
+        rsync -rclpDv --exclude=".git" --delete-before _quarto_build_latex/ _overleaf_mlbook2testbed
         cd _overleaf_mlbook2testbed
         git config user.name "GitHub Action Deploy Bot"
         git config user.email "github-action-deploy@simply-logical.space"
