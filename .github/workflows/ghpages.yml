@@ -48,7 +48,7 @@ jobs:
         quarto check
     - name: Install Quarto Extensions
       run: |
-        quarto add simply-logical/quarto_indexer
+        quarto add simply-logical/quarto_index@master --no-prompt
     - name: Build HTML
       run: |
         quarto render . --no-clean --output-dir _quarto_build_html --to html

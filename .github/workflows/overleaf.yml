@@ -63,7 +63,7 @@ jobs:
         quarto check
     - name: Install Quarto Extensions
       run: |
-        quarto add simply-logical/quarto_indexer
+        quarto add simply-logical/quarto_index@master --no-prompt
     - name: Get latest Overleaf
       run: |
         [ ! -d _overleaf_mlbook2testbed ] && git clone --depth 1 https://git:${{ secrets.OVERLEAF_DEPLOYMENT_KEY }}@git.overleaf.com/${{ secrets.OVERLEAF_REPO }} _overleaf_mlbook2testbed
