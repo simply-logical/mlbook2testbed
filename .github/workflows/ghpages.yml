@@ -46,6 +46,9 @@ jobs:
         /opt/quarto/"${QUARTO_VERSION}"/bin/quarto check
         /usr/local/bin/quarto check
         quarto check
+    - name: Install Quarto Extensions
+      run: |
+        quarto add simply-logical/quarto_indexer
     - name: Build HTML
       run: |
         quarto render . --no-clean --output-dir _quarto_build_html --to html
