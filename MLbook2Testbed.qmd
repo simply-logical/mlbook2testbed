@@ -10,6 +10,4 @@ Quarto enables you to weave together content and executable code into a finished
 
 Let's test some {{< indexer_add_term indexing >}}.
 
-## Index
-
 {{< indexer_print >}}
